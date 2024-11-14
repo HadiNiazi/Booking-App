@@ -1,5 +1,7 @@
 @extends('layouts.auth')
 
+@section('title', 'Create Event')
+
 @section('css')
 <style>
     textarea.form-control, textarea.asColorPicker-input, .select2-container--default textarea.select2-selection--single, .select2-container--default .select2-selection--single textarea.select2-search__field, textarea.typeahead, textarea.tt-query, textarea.tt-hint {
@@ -9,7 +11,15 @@
 @endsection
 
 @section('content')
+
+<div class="row mb-3">
+    <div class="col-2">
+        <a href="{{ route('events.index') }}" class="btn btn-info">Go Back</a>
+    </div>
+</div>
+
 <div class="col-12 grid-margin stretch-card">
+
     <div class="card">
       <div class="card-body">
         <h4 class="card-title">Events</h4>

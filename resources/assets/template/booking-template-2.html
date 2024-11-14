@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Body and Background */
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #e0f7fa 100%);
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        
+        /* Header Section */
+        .header-section {
+            text-align: center;
+            padding: 3rem 0;
+            background-color: #5dbf73; /* Semi-transparent */
+            color: #ffffff;
+            margin-bottom: 2rem;
+            border-radius: 12px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        .header-section h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .header-section p {
+            font-size: 1.2rem;
+            color: #f5f5f5;
+        }
+        
+        /* Events Section */
+        .events-section {
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.8); /* Light, semi-transparent */
+            border-radius: 12px;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Event Card */
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.9); /* Transparent background */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .card-header {
+            padding: 1rem;
+            font-weight: bold;
+            color: #ffffff;
+            background: #64c178;
+            text-align: center;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .event-title {
+            font-weight: bold;
+            color: #003C71;
+            font-size: 1.2rem;
+        }
+        .card-text {
+            color: #555555;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .price {
+            font-size: 1.3rem;
+            color: #b53131;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .badge-free {
+            background-color: #31a8c6;
+            color: #ffffff;
+        }
+        .badge-paid {
+            background-color: #dc3545;
+            color: #ffffff;
+        }
+
+        /* Pagination */
+        .pagination {
+            justify-content: center;
+            margin-top: 2rem;
+        }
+        .btn:hover {
+            transform: scale(1.07);
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Section -->
+<div class="header-section">
+    <h1>Explore Our Exclusive Events</h1>
+    <p>Discover, book, and enjoy the best events tailored just for you. Don’t miss out on the fun!</p>
+</div>
+
+<!-- Events Section -->
+<div class="container my-5">
+    <div class="events-section">
+        <div class="row g-4">
+            <!-- Event Card Template - Repeat for Each Event -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                         
+                        Event Name
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text"><strong>Location:</strong> Event Location</p>
+                        <p class="card-text"><strong>Category:</strong> Category Name</p>
+                        <p class="card-text"><strong>Start Date:</strong> 01/01/2024</p>
+                        <p class="card-text"><strong>End Date:</strong> 01/02/2024</p>
+                        <p class="card-text"><strong>Max Attendees:</strong> 50</p>
+                        <p class="price"><span class="badge badge-free">Free</span></p>
+                        <button class="btn w-100" style="background-color: #1e8d52; color:white" onclick="alert('Booking successful!')">Book Now</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Additional Event Cards here -->
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        Event Name
+                    </div>
+                    <div class="card-body">
+                        <!-- <h5 class="event-title">Paid Event</h5> -->
+                        <p class="card-text"><strong>Location:</strong> Event Location</p>
+                        <p class="card-text"><strong>Category:</strong> Category Name</p>
+                        <p class="card-text"><strong>Start Date:</strong> 01/01/2024</p>
+                        <p class="card-text"><strong>End Date:</strong> 01/02/2024</p>
+                        <p class="card-text"><strong>Max Attendees:</strong> 20</p>
+                        <p class="price">$0</p>
+                        <button class="btn w-100" style="background-color: #1e8d52; color:white" onclick="alert('Booking successful!')">Book Now</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Event pagination" class="mt-4">
+            <ul class="pagination">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

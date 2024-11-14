@@ -2,15 +2,26 @@
 
 use App\Http\Controllers\Auth\EventController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Site\HomeController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::prefix('auth')->middleware(['auth', 'verified'])->group(function() {
+
+    Route::get('/dashboard', function () {
+        return view('auth.dashboard');
+    })->name('dashboard');
+
+    Route::resource('events', EventController::class);
+
 });
 
-Route::get('/dashboard', function () {
-    return view('auth.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', [HomeController::class, 'openHomePage'])->name('site.home');
+Route::get('events/{id}', [HomeController::class, 'openEventDetailsPage'])->name('site.details');
+
+Route::get('thanku', [HomeController::class, 'openThankuPage'])->name('site.thanku');
+Route::get('cancel', [HomeController::class, 'openCancelPage'])->name('site.cancel');
+
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -18,6 +29,5 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::resource('events', EventController::class);
 
 require __DIR__.'/auth.php';

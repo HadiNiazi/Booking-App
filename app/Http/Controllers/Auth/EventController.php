@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\Event\CreateRequest;
+use App\Http\Requests\Auth\Event\UpdateRequest;
 use App\Models\Category;
 use App\Models\Event;
 use Illuminate\Http\Request;
@@ -48,7 +49,7 @@ class EventController extends Controller
                 'category_id' => $category ? $category->id: null,
                 'location' => $request->location,
                 'type' => $request->type,
-                'price' => $request->price,
+                'price' => $request->price ? $request->price: 0,
                 'start_date' => $request->start_date, // 2024-10-15
                 'end_date' => $request->end_date,
                 'max_attendees' => $request->max_attendees
@@ -68,32 +69,73 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Event $event)
     {
-        //
+        // $event = Event::findOrFail($id);
+
+        return view('auth.events.show', ['event' => $event]);
+        // return view('auth.events.show')->with('event', $event);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Event $event)
     {
-        //
+        $categories = Category::all();
+
+        return view('auth.events.edit', compact('categories', 'event'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateRequest $request, Event $event)
     {
-        //
+        $category = Category::find($request->category);
+
+        if (! $category) {
+            return back()->withErrors('Unable to find the category, Please choose the correct value.');
+        }
+
+        try {
+            $event->update([
+                'name' => $request->name,
+                'description' => $request->description,
+                'category_id' => $category ? $category->id: null,
+                'location' => $request->location,
+                'type' => $request->type,
+                'price' => $request->price,
+                'start_date' => $request->start_date, // 2024-10-15
+                'end_date' => $request->end_date,
+                'max_attendees' => $request->max_attendees,
+                // addition columns here
+            ]);
+
+            session()->flash('success_msg', 'Post Updated Successfully!');
+
+            return to_route('events.index');
+        }
+        catch(\Exception $ex) {
+            return back()->withInput()->withErrors('Something went wrong, the error is: '. $ex->getMessage());
+        }
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Event $event)
     {
-        //
+        try {
+            $event->delete();
+
+            session()->flash('success_msg', 'Event Removed Successfully!');
+
+            return to_route('events.index');
+        }
+        catch(\Exception $ex) {
+            return back()->withErrors('Something went wrong! '. $ex->getMessage());
+        }
     }
 }

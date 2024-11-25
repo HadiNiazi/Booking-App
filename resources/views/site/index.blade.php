@@ -37,7 +37,7 @@
                                     <span class="badge badge-free">Free</span>
                                 @endif
                             </p>
-                            <button class="btn w-100" style="background-color: #1e8d52; color:white" onclick="alert('Booking successful!')">Book Now</button>
+                            <a href="{{ route('site.event.details', $event->id) }}" class="btn w-100" style="background-color: #1e8d52; color:white">View Details</a>
                         </div>
                     </div>
                 </div>

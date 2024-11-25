@@ -91,77 +91,65 @@
 @endsection
 
 <div class="container my-5">
+
+    @if (session('booking_failed'))
+        <div class="alert alert-danger" role="alert">
+            {{ session()->get('booking_failed') }}
+        </div>
+    @endif
+
+    <div class="row mb-3">
+        <div class="col-2">
+            <a href="{{ route('site.home') }}" class="btn btn-info text-white">Go Back</a>
+        </div>
+    </div>
+
     <div class="event-details-section">
-        <div class="row">
-            <div class="col-12">
-                <!-- Placeholder with Icon Instead of Image -->
+        @if ($event)
+            <div class="row">
+                <div class="col-12">
+                    <!-- Placeholder with Icon Instead of Image -->
 
 
-                <h2 class="event-title">Amazing Event</h2>
-                <p class="card-text"><strong>Location:</strong> Event Location</p>
-                <p class="card-text"><strong>Category:</strong> Category Name</p>
-                <p class="card-text"><strong>Date:</strong> 01/01/2024 - 01/02/2024</p>
-                <p class="card-text"><strong>Max Attendees:</strong> 50</p>
-                <p class="card-text"><strong>Description:</strong> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque vel turpis cursus, bibendum dolor vel, tincidunt ex.</p>
-                <p class="price-badge">Price: $20</p>
-            </div>
-        </div>
+                    <h2 class="event-title">{{ $event->name }}</h2>
 
-        <!-- Stripe Checkout Section -->
-        <div class="checkout-section mt-4">
-            <h3>Complete Your Payment</h3>
-            <p>Enter your payment information below to secure your booking.</p>
-            <form id="payment-form">
-                <div class="mb-3">
-                    <label for="card-element" class="form-label">Credit or debit card</label>
-                    <div id="card-element" class="form-control">
-                        <!-- Stripe Card Element will be inserted here -->
+
+
+                    <p class="card-text"><strong>Price:</strong>
+
+                        @if ($event->type == 'PAID')
+                            <span> ${{ $event->price }} </span>
+                        @else
+                            <span> <span class="badge badge-free">Free</span></span>
+                        @endif
+
+                    </p>
+
+
+                    <p class="card-text"><strong>Location:</strong> {{ $event->location }}</p>
+                    <p class="card-text"><strong>Category:</strong> {{ $event->category ? $event->category->name: '' }} </p>
+                    <p class="card-text"><strong>Start Date:</strong> {{ date('D M Y', strtotime($event->start_date)) }} </p>
+                    <p class="card-text"><strong>End Date:</strong> {{ date('D M Y', strtotime($event->end_date)) }} </p>
+                    <p class="card-text"><strong>Max Attendees:</strong> {{ $event->max_attendees }}</p>
+                    <p class="card-text"><strong>Description:</strong> {{ $event->description }}</p>
+
+                    </p>
+
+                    <div class="text-center">
+                        <form action="{{ route('checkout') }}">
+                            <input type="hidden" name="event_id" value="{{ $event->id }}">
+                            <button class="btn btn-success btn-lg">Checkout</button>
+                        </form>
                     </div>
-                    <div id="card-errors" role="alert" style="color: red; margin-top: 10px;"></div>
+
                 </div>
-                <button class="btn w-100" style="background-color: #1e8d52; color: white;" id="submit-button">Pay $20</button>
-            </form>
-        </div>
+            </div>
+
+
+        @else
+            <p class="text-danger text-center text-bold mt-3">Unable to find the event details.</p>
+        @endif
     </div>
 </div>
 @endsection
 
-@section('script')
-<script>
-    // Initialize Stripe with your public key
-    const stripe = Stripe('YOUR_PUBLIC_STRIPE_KEY');
-    const elements = stripe.elements();
-
-    // Create an instance of the card Element
-    const card = elements.create('card', { style: { base: { fontSize: '16px', color: '#32325d' }}});
-    card.mount('#card-element');
-
-    // Handle real-time validation errors from the card Element
-    card.on('change', function(event) {
-        const displayError = document.getElementById('card-errors');
-        if (event.error) {
-            displayError.textContent = event.error.message;
-        } else {
-            displayError.textContent = '';
-        }
-    });
-
-    // Handle form submission
-    const form = document.getElementById('payment-form');
-    form.addEventListener('submit', async function(event) {
-        event.preventDefault();
-
-        const { paymentMethod, error } = await stripe.createPaymentMethod({
-            type: 'card',
-            card: card,
-        });
-
-        if (error) {
-            document.getElementById('card-errors').textContent = error.message;
-        } else {
-            alert('Payment successful! Your booking has been confirmed.');
-            // Here you would normally send the paymentMethod.id to your server for further processing.
-        }
-    });
-</script>
-@endsection

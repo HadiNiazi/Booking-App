@@ -52,11 +52,16 @@
 </head>
 <body>
 
-<div class="thank-you-section">
-    <h1>Thank You!</h1>
-    <p>Your booking was successful. We look forward to seeing you at the event.</p>
-    <a href="index.html" class="btn-home">Return to Home</a>
-</div>
+    @if (session('success_msg'))
+    <div class="thank-you-section">
+        <h1>Thank You!</h1>
+        <p>{{ session()->get('success_msg') }} We look forward to seeing you at the event.</p>
+        <a href="{{ route('site.home') }}" class="btn-home">Return to Home</a>
+    </div>
+
+    @else
+        <p class="text-danger text-center">Booking failed, please contact with support!</p>
+    @endif
 
 </body>
 </html>

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Site;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Booking;
 use App\Models\Event;
+use App\Models\Booking;
+use Illuminate\Http\Request;
 use \Stripe\Checkout\Session;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class HomeController extends Controller
 {
@@ -19,6 +20,8 @@ class HomeController extends Controller
 
     public function openEventDetailsPage($id)
     {
+        // session()->flush();
+        // dd(session()->get('event_type'));
         $event = Event::findOrFail($id);
 
         return view('site.details', compact('event'));
@@ -32,9 +35,13 @@ class HomeController extends Controller
         $userId = auth()->id();
         $eventId = $request->event_id;
 
-        $event = Event::findOrFail($eventId);
+        DB::beginTransaction();
 
-        $alreadyRegistered = Booking::where('user_id', $userId)->where('event_id', $eventId)
+        $event = Event::where('id', $eventId)->lockForUpdate()->first();
+
+        try {
+
+            $alreadyRegistered = Booking::where('user_id', $userId)->where('event_id', $eventId)
                                     // ->where('status', 'paid')
                                     // ->orWhere('status', 'free')
                                     ->where( function($query) {
@@ -43,9 +50,32 @@ class HomeController extends Controller
                                     })
                                     ->first();
 
-        if ($alreadyRegistered) {
-            return back()->with('booking_failed', 'You are already registered for this event');
+            $seatsLeft = $event->max_attendees;
+
+            if ($seatsLeft < 1) {
+                throw new \Exception('Event seats are booked, you can enroll into any other event');
+                // return back()->with('booking_failed', 'Event seats are booked, you can enroll into any other event.');
+            }
+
+            if ($alreadyRegistered) {
+                throw new \Exception('You are already registered for this event');
+                // return back()->with('booking_failed', 'You are already registered for this event');
+            }
+
+
+            $this->saveEventInDatabase($userId, $eventId, $event->type == 'PAID' ? 'unpaid': 'free');
+            $event->decrement('max_attendees');
+
+            DB::commit();
+
         }
+        catch (\Exception $ex) {
+            DB::rollback();
+            return back()->with('booking_failed', $ex->getMessage());
+        }
+
+        // in case of any error it should increment one attende.
+
 
         if ($event->type == 'PAID') {
 
@@ -71,7 +101,9 @@ class HomeController extends Controller
                 'cancel_url' => route('site.cancel'),
             ]);
 
-            $this->saveEventInDatabase($userId, $eventId);
+            // $event->update([
+            //     'max_attendees' => $event->max_attendes - 1
+            // ]);
 
             session()->flash('success_msg', 'Your Booking Confirmed');
             session()->put('event_type', 'PAID');
@@ -87,12 +119,7 @@ class HomeController extends Controller
         // else if ($event->type == 'FREE')
         else
         {
-            $status = 'FREE';
-
-            $this->saveEventInDatabase($userId, $eventId, $status);
-
-            return to_route('site.thanku')
-                            ->with('success_msg', 'Your Booking Confirmed!');
+            return to_route('site.thanku')->with('success_msg', 'Your Booking Confirmed!');
         }
 
 
@@ -129,23 +156,51 @@ class HomeController extends Controller
 
         }
 
+        session()->forget('event_type');
 
         return view('site.thanku');
     }
 
     public function openCancelPage()
     {
-        return view('site.cancel');
+        if (session()->has('event_type')) {
+
+            if (session()->get('event_type') == 'PAID') {
+
+                \Stripe\Stripe::setApiKey( config('services.stripe.secret') );
+
+                $sessionId = request()->session_id;
+
+                $session = Session::retrieve($sessionId);
+
+                $metaData = $session->metadata;
+
+                $userId = $metaData->user_id;
+                $eventId = $metaData->event_id;
+
+                $booking = Booking::where('user_id', $userId)->where('event_id', $eventId)
+                                ->where('status', 'unpaid')
+                                ->first();
+
+                $booking->increment('max_attendees'); // + 1 in seats
+
+            }
+
+        }
+
+        session()->forget('event_type');
+        // $event->decremnt('max_attendees');
+        // return view('site.cancel'); // before this fix the above cancel booking seats decrement issue
     }
 
 
-    private function saveEventInDatabase($userId, $eventId, $status = null)
+    private function saveEventInDatabase($userId, $eventId, $status)
     {
         try {
             Booking::create([
                 'user_id' => $userId,
                 'event_id' => $eventId,
-                'status' => $status != null ? 'free': 'unpaid'
+                'status' => $status
             ]);
         }
         catch(\Exception $ex) {

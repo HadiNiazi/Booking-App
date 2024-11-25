@@ -55,7 +55,7 @@
 <div class="cancel-section">
     <h1>Booking Canceled</h1>
     <p>Your booking was canceled. If you have any questions, please contact support.</p>
-    <a href="index.html" class="btn-home">Return to Home</a>
+    <a href="{{ route('site.home') }}" class="btn-home">Return to Home</a>
 </div>
 
 </body>

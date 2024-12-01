@@ -45,4 +45,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function checkRoleOrAbort(string $role = 'user')
+    {
+        if ($this->role === $role) {
+            abort(403, 'You are not authorized for this page!');
+        }
+    }
 }

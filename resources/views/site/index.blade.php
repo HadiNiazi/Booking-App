@@ -7,6 +7,22 @@
 <div class="header-section">
     <h1>Explore Our Exclusive Events</h1>
     <p>Discover, book, and enjoy the best events tailored just for you. Don’t miss out on the fun!</p>
+
+    {{-- @auth
+
+    @else
+
+    @endauth --}}
+
+    <div class="mt-5">
+        @if(auth()->check())
+            <a href="{{ route('dashboard') }}" class="btn btn-success">Dashboard</a>
+        @else
+            <a href="{{ route('login') }}" class="btn btn-primary">Login</a>
+            <a href="{{ route('register') }}" class="btn btn-primary">Register</a>
+        @endif
+    </div>
+
 </div>
 @endsection
 

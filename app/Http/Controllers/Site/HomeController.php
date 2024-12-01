@@ -98,7 +98,7 @@ class HomeController extends Controller
                     // 'preferred_payment_method' => 'ideal',
                 ],
                 'success_url' => route('site.thanku') . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('site.cancel'),
+                'cancel_url' => route('site.cancel'). '?session_id={CHECKOUT_SESSION_ID}',
             ]);
 
             // $event->update([
@@ -180,17 +180,24 @@ class HomeController extends Controller
 
                 $booking = Booking::where('user_id', $userId)->where('event_id', $eventId)
                                 ->where('status', 'unpaid')
-                                ->first();
+                                ->first()->delete();
 
-                $booking->increment('max_attendees'); // + 1 in seats
+                $event = Event::find($eventId);
+
+                if (! $event) {
+                    // send email to administrator {$eventId}
+                    \Log::emergency("Booking was not completed, but seat is still reserved becuase we are not able to find the event.". $eventId);
+                    // return to_route('checkout')->with('booking_failed', '');
+                }
+
+                $event->increment('max_attendees'); // + 1 in seats
 
             }
 
         }
 
         session()->forget('event_type');
-        // $event->decremnt('max_attendees');
-        // return view('site.cancel'); // before this fix the above cancel booking seats decrement issue
+        return view('site.cancel');
     }
 
 

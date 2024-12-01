@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\Event\UpdateRequest;
 use App\Models\Category;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Models\Booking;
 
 class EventController extends Controller
 {
@@ -16,7 +17,16 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Event::all(); // with()
+        $user = auth()->user();
+
+        if ($user->role == 'user') {
+            $bookings = Booking::where('user_id', $user->id)->where('status', 'paid')->pluck('event_id');
+
+            $events = Event::whereIn('id', $bookings)->get();
+        }
+        else {
+            $events = Event::all(); // with()
+        }
 
         return view('auth.events.index', compact('events'));
     }
@@ -26,6 +36,8 @@ class EventController extends Controller
      */
     public function create()
     {
+        auth()->user()->checkRoleOrAbort();
+
         $categories = Category::all();
 
         return view('auth.events.create', compact('categories'));
@@ -82,6 +94,8 @@ class EventController extends Controller
      */
     public function edit(Event $event)
     {
+        auth()->user()->checkRoleOrAbort();
+
         $categories = Category::all();
 
         return view('auth.events.edit', compact('categories', 'event'));
@@ -92,6 +106,8 @@ class EventController extends Controller
      */
     public function update(UpdateRequest $request, Event $event)
     {
+        auth()->user()->checkRoleOrAbort();
+
         $category = Category::find($request->category);
 
         if (! $category) {
@@ -127,6 +143,8 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
+        auth()->user()->checkRoleOrAbort();
+
         try {
             $event->delete();
 

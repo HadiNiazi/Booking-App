@@ -20,7 +20,9 @@
 
     <div class="row mb-3">
         <div class="col-2">
-            <a href="{{ route('events.create') }}" class="btn btn-info">New Event</a>
+            @if (auth()->user()->role == 'admin')
+                <a href="{{ route('events.create') }}" class="btn btn-info">New Event</a>
+            @endif
         </div>
     </div>
 
@@ -88,12 +90,17 @@
                             </td>
                             <td style="display: flex">
                                 <a href="{{ route('events.show', $event->id) }}" class="btn btn-success">Show</a> &nbsp;
-                                <a href="{{ route('events.edit', $event->id) }}" class="btn btn-info">Edit</a> &nbsp;
-                                <form class="event-delete-form" method="post" action="{{ route('events.destroy', $event->id) }}">
-                                @csrf
-                                @method('DELETE')
-                                    <button class="btn btn-danger delete-btn">Delete</button>
-                                </form>
+
+                                @if (auth()->user()->role == 'admin')
+
+                                    <a href="{{ route('events.edit', $event->id) }}" class="btn btn-info">Edit</a> &nbsp;
+                                    <form class="event-delete-form" method="post" action="{{ route('events.destroy', $event->id) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                        <button class="btn btn-danger delete-btn">Delete</button>
+                                    </form>
+                                @endif
+
                             </td>
 
                         </tr>

@@ -67,6 +67,8 @@ class EventController extends Controller
                 'max_attendees' => $request->max_attendees
             ]);
 
+            // send notification
+
             session()->flash('success_msg', 'Event Saved Successfully!');
 
             // return redirect()->route('events.index');

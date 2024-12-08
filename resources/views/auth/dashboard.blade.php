@@ -7,14 +7,13 @@
 <div class="col-sm-4 grid-margin">
     <div class="card">
     <div class="card-body">
-        <h5>Revenue</h5>
+        <h5>Completed</h5>
         <div class="row">
         <div class="col-8 col-sm-12 col-xl-8 my-auto">
             <div class="d-flex d-sm-block d-md-flex align-items-center">
-            <h2 class="mb-0">$32123</h2>
-            <p class="text-success ms-2 mb-0 font-weight-medium">+3.5%</p>
+            <h2 class="mb-0">{{ $completed_booking ? $completed_booking: 0 }}</h2>
             </div>
-            <h6 class="text-muted font-weight-normal">11.38% Since last month</h6>
+            <h6 class="text-muted font-weight-normal">Lifetime bookings</h6>
         </div>
         <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
             <i class="icon-lg mdi mdi-codepen text-primary ms-auto"></i>
@@ -26,14 +25,13 @@
 <div class="col-sm-4 grid-margin">
     <div class="card">
     <div class="card-body">
-        <h5>Sales</h5>
+        <h5>Incomplete</h5>
         <div class="row">
         <div class="col-8 col-sm-12 col-xl-8 my-auto">
             <div class="d-flex d-sm-block d-md-flex align-items-center">
-            <h2 class="mb-0">$45850</h2>
-            <p class="text-success ms-2 mb-0 font-weight-medium">+8.3%</p>
+            <h2 class="mb-0">{{ $incomplete_bookings ? $incomplete_bookings: 0 }}</h2>
             </div>
-            <h6 class="text-muted font-weight-normal"> 9.61% Since last month</h6>
+            <h6 class="text-muted font-weight-normal"> Lifetime bookings</h6>
         </div>
         <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
             <i class="icon-lg mdi mdi-wallet-travel text-danger ms-auto"></i>
@@ -45,14 +43,13 @@
 <div class="col-sm-4 grid-margin">
     <div class="card">
     <div class="card-body">
-        <h5>Purchase</h5>
+        <h5>Categories</h5>
         <div class="row">
         <div class="col-8 col-sm-12 col-xl-8 my-auto">
             <div class="d-flex d-sm-block d-md-flex align-items-center">
-            <h2 class="mb-0">$2039</h2>
-            <p class="text-danger ms-2 mb-0 font-weight-medium">-2.1% </p>
+            <h2 class="mb-0">{{ $categoriesCount ? $categoriesCount: 0 }}</h2>
             </div>
-            <h6 class="text-muted font-weight-normal">2.27% Since last month</h6>
+            <h6 class="text-muted font-weight-normal">Total Categories</h6>
         </div>
         <div class="col-4 col-sm-12 col-xl-4 text-center text-xl-right">
             <i class="icon-lg mdi mdi-monitor text-success ms-auto"></i>
@@ -67,64 +64,72 @@
 <div class="col-12 grid-margin">
     <div class="card">
     <div class="card-body">
-        <h4 class="card-title">Order Status</h4>
+        <h4 class="card-title">Recent events</h4>
         <div class="table-responsive">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>
-                <div class="form-check form-check-muted m-0">
-                    <label class="form-check-label">
-                    <input type="checkbox" class="form-check-input">
-                    </label>
-                </div>
-                </th>
-                <th> Client Name </th>
-                <th> Product Cost </th>
-                <th> Project </th>
-                <th> Payment Mode </th>
-                <th> Start Date </th>
-                <th> Payment Status </th>
-            </tr>
-            </thead>
-            <tbody>
+            @if(count($events) > 0)
+            <table id="event-table" class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Price</th>
+                    <th>Max Attendees</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    @foreach ($events as $event)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $event->name }}</td>
+                            {{-- <td>
+                                @php
+                                    $category = null;
+                                @endphp
+                                @if ($event->category)
+                                    @php
+                                        $category = $event->category->name;
+                                    @endphp
+                                @endif
+                                {{ $category }}
+                            </td> --}}
+                            <td>{{ $event->location }}</td>
 
-            <tr>
-                <td>
-                <div class="form-check form-check-muted m-0">
-                    <label class="form-check-label">
-                    <input type="checkbox" class="form-check-input">
-                    </label>
-                </div>
-                </td>
-                <td> 02312 </td>
-                <td> $14,500 </td>
-                <td> Website </td>
-                <td> Cash on delivered </td>
-                <td> 04 Dec 2019 </td>
-                <td>
-                <div class="badge badge-outline-warning">Pending</div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                <div class="form-check form-check-muted m-0">
-                    <label class="form-check-label">
-                    <input type="checkbox" class="form-check-input">
-                    </label>
-                </div>
-                </td>
-                <td> 02312 </td>
-                <td> $14,500 </td>
-                <td> App design </td>
-                <td> Credit card </td>
-                <td> 04 Dec 2019 </td>
-                <td>
-                <div class="badge badge-outline-danger">Rejected</div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                            <td>{{ number_format($event->price) }}</td>
+                            <td>{{ $event->max_attendees }}</td>
+                            <td>
+                                @if ($event->type == 'FREE')
+                                    <span class="badge badge-primary">{{ $event->type }}</span>
+                                @elseif ($event->type == 'PAID')
+                                    <span class="badge badge-success">{{ $event->type }}</span>
+                                @else
+                                    <span class="badge badge-info">{{ $event->type }}</span>
+                                @endif
+                            </td>
+                            <td style="display: flex">
+                                <a href="{{ route('events.show', $event->id) }}" class="btn btn-success">Show</a> &nbsp;
+
+                                @if (auth()->user()->role == 'admin')
+
+                                    <a href="{{ route('events.edit', $event->id) }}" class="btn btn-info">Edit</a> &nbsp;
+                                    <form class="event-delete-form" method="post" action="{{ route('events.destroy', $event->id) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                        <button class="btn btn-danger delete-btn">Delete</button>
+                                    </form>
+                                @endif
+
+                            </td>
+
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            @else
+            <p class="text-danger text-bold text-center mt-3"><b>No event created yet.</b></p>
+            @endif
         </div>
     </div>
     </div>

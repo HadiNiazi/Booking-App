@@ -37,9 +37,9 @@
                   <img class="img-xs rounded-circle " src=" {{ Vite::asset('resources/assets/images/faces/face15.jpg') }}" alt="">
                   <span class="count bg-success"></span>
                 </div>
-                <div class="profile-name">
+                <div class="profile-name ">
                   <h5 class="mb-0 font-weight-normal">{{ auth()->user() ? auth()->user()->name: '' }}</h5>
-                  <span>Role Name</span>
+                  <span style="font-weight: 800">{{ strtoupper(auth()->user()->role) }}</span>
                 </div>
               </div>
             </div>
@@ -78,7 +78,7 @@
             </button>
             <ul class="navbar-nav navbar-nav-right">
 
-              <li class="nav-item dropdown border-left">
+              {{-- <li class="nav-item dropdown border-left">
                 <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
                   <i class="mdi mdi-bell"></i>
                   <span class="count bg-danger"></span>
@@ -124,7 +124,7 @@
                   <div class="dropdown-divider"></div>
                   <p class="p-3 mb-0 text-center">See all notifications</p>
                 </div>
-              </li>
+              </li> --}}
               <li class="nav-item dropdown">
                 <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
                   <div class="navbar-profile">
@@ -136,7 +136,7 @@
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="profileDropdown">
                   <h6 class="p-3 mb-0">Profile</h6>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
+                  <a href="{{ route('profile.edit') }}" class="dropdown-item preview-item">
                     <div class="preview-thumbnail">
                       <div class="preview-icon bg-dark rounded-circle">
                         <i class="mdi mdi-settings text-success"></i>

@@ -60,7 +60,15 @@
               <span class="menu-icon">
                 <i class="mdi mdi-playlist-play"></i>
               </span>
-              <span class="menu-title">Events</span>
+              <span class="menu-title">{{ auth()->user()->role == 'user' ? 'Bookings': 'Events' }}</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="{{ route('site.home') }}">
+              <span class="menu-icon">
+                <i class="mdi mdi-playlist-play"></i>
+              </span>
+              <span class="menu-title">Visit site</span>
             </a>
           </li>
         </ul>

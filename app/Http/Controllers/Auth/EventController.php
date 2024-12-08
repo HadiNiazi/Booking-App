@@ -19,14 +19,13 @@ class EventController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->role == 'user') {
-            $bookings = Booking::where('user_id', $user->id)->where('status', 'paid')->pluck('event_id');
+        $eventsQuery = $user->role === 'user'
+            ? Event::whereIn('id', Booking::where('user_id', $user->id)
+                                        ->whereIn('status', ['paid', 'free'])
+                                        ->pluck('event_id'))
+            : Event::query();
 
-            $events = Event::whereIn('id', $bookings)->get();
-        }
-        else {
-            $events = Event::all(); // with()
-        }
+        $events = $eventsQuery->get();
 
         return view('auth.events.index', compact('events'));
     }

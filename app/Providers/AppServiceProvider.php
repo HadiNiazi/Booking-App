@@ -21,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
     {
         view()->composer('*', function ($view) {
 
+            $unreadNotifications = 0;
+
             if (auth()->check()) {
                 $unreadNotifications = auth()->user()->notifications()->wherePivot('is_read', 0)->count();
             }

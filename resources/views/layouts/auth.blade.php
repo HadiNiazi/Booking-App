@@ -86,15 +86,27 @@
             </button>
             <ul class="navbar-nav navbar-nav-right">
 
-              {{-- <li class="nav-item dropdown border-left">
+              <li class="nav-item dropdown border-left">
                 <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
                   <i class="mdi mdi-bell"></i>
                   <span class="count bg-danger"></span>
                 </a>
+
+
                 <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
-                  <h6 class="p-3 mb-0">Notifications</h6>
+                  <h6 class="p-3 mb-0">Notifications <span class="badge badge-danger">{{ $unreadNotifications ? $unreadNotifications: 0 }}</span> </h6>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
+
+                  @forelse (auth()->user()->notifications->take(3) as $notification)
+                  {{-- @dd($notification->pivot_notification_id) --}}
+
+                  @if ($notification->pivot->is_read == 1)
+                    <a style="background-color: #d7d7d3 !important" class="dropdown-item preview-item" href="{{ route('mark.as.read', ['notification_id' => $notification->pivot->notification_id, 'user_id' => $notification->pivot->user_id]) }}">
+                  @else
+                    <a style="background-color: #b8b8b6 !important" class="dropdown-item preview-item" href="{{ route('mark.as.read', ['notification_id' => $notification->pivot->notification_id, 'user_id' => $notification->pivot->user_id]) }}">
+                  @endif
+
+
                     <div class="preview-thumbnail">
                       <div class="preview-icon bg-dark rounded-circle">
                         <i class="mdi mdi-calendar text-success"></i>
@@ -102,42 +114,33 @@
                     </div>
                     <div class="preview-item-content">
                       <p class="preview-subject mb-1">Event today</p>
-                      <p class="text-muted ellipsis mb-0"> Just a reminder that you have an event today </p>
+                      <p class="text-muted ellipsis mb-0"> {{ $notification->title }} </p>
                     </div>
                   </a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
-                    <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-settings text-danger"></i>
-                      </div>
-                    </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject mb-1">Settings</p>
-                      <p class="text-muted ellipsis mb-0"> Update dashboard </p>
-                    </div>
+
+                  @empty
+                      <p class="text-danger text-center text-center mt-2">No notification yet!</p>
+
+                  @endforelse
+
+
+                  @if (auth()->user()->notifications->count() > 0)
+                  <a style="text-decoration: none; color:white" href="{{ route('notifications.all') }}">
+                    <p class="p-3 mb-0 text-center">See all notifications</p>
                   </a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item preview-item">
-                    <div class="preview-thumbnail">
-                      <div class="preview-icon bg-dark rounded-circle">
-                        <i class="mdi mdi-link-variant text-warning"></i>
-                      </div>
-                    </div>
-                    <div class="preview-item-content">
-                      <p class="preview-subject mb-1">Launch Admin</p>
-                      <p class="text-muted ellipsis mb-0"> New admin wow! </p>
-                    </div>
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <p class="p-3 mb-0 text-center">See all notifications</p>
+                  @endif
+
+
+
                 </div>
-              </li> --}}
+              </li>
+
               <li class="nav-item dropdown">
                 <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
                   <div class="navbar-profile">
                     <img class="img-xs rounded-circle" src="{{ Vite::asset('resources/assets/images/faces/face15.jpg') }}" alt="">
-                    <p class="mb-0 d-none d-sm-block navbar-profile-name">Henry Klein</p>
+                    <p class="mb-0 d-none d-sm-block navbar-profile-name">{{ auth()->user()->name }}</p>
                     <i class="mdi mdi-menu-down d-none d-sm-block"></i>
                   </div>
                 </a>
@@ -179,6 +182,7 @@
         <!-- partial -->
         <div class="main-panel">
           <div class="content-wrapper">
+
             @yield('content')
           </div>
           <!-- content-wrapper ends -->

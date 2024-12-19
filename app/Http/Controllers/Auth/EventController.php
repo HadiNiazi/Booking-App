@@ -9,6 +9,9 @@ use App\Models\Category;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Models\Booking;
+use App\Models\Notification;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
@@ -47,6 +50,7 @@ class EventController extends Controller
      */
     public function store(CreateRequest $request)
     {
+        $users = User::where('role', 'user')->get();
         $category = Category::find($request->category);
 
         if (! $category) {
@@ -54,7 +58,10 @@ class EventController extends Controller
         }
 
         try {
-            Event::create([
+
+            DB::beginTransaction();
+
+            $event = Event::create([
                 'name' => $request->name,
                 'description' => $request->description,
                 'category_id' => $category ? $category->id: null,
@@ -67,6 +74,16 @@ class EventController extends Controller
             ]);
 
             // send notification
+            $notification = Notification::create([
+                'created_by' => auth()->id(),
+                'title' => 'Event '. $event->name. 'has been started'
+            ]);
+
+            foreach ($users as $user) {
+                $user->notifications()->attach($notification->id);
+            }
+
+            DB::commit();
 
             session()->flash('success_msg', 'Event Saved Successfully!');
 
@@ -74,6 +91,7 @@ class EventController extends Controller
             return to_route('events.index');
         }
         catch(\Exception $ex) {
+            DB::rollback();
             return back()->withInput()->withErrors('Something went wrong, the error is: '. $ex->getMessage());
             // withInput
         }

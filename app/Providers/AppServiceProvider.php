@@ -19,6 +19,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        view()->composer('*', function ($view) {
+
+            if (auth()->check()) {
+                $unreadNotifications = auth()->user()->notifications()->wherePivot('is_read', 0)->count();
+            }
+
+            $view->with('unreadNotifications', $unreadNotifications);
+
+        });
+
     }
 }

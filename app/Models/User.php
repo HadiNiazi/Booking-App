@@ -52,4 +52,9 @@ class User extends Authenticatable
             abort(403, 'You are not authorized for this page!');
         }
     }
+
+    public function notifications()
+    {
+        return $this->belongsToMany(Notification::class)->withPivot('is_read');
+    }
 }
